@@ -23,6 +23,7 @@ from tensorflow_datasets.core import utils
 from tensorflow_datasets.scripts.documentation import build_community_catalog
 
 DatasetSource = tfds.core.community.dataset_sources.DatasetSource
+DatasetSourceType = tfds.core.community.dataset_sources.DatasetSourceType
 DatasetPackage = tfds.core.community.register_package.DatasetPackage
 DatasetName = utils.DatasetName
 
@@ -32,7 +33,10 @@ def _create_dataset_package(namespace: str, name: str) -> DatasetPackage:
       f'github://huggingface/datasets/tree/master/datasets/{name}')
   return DatasetPackage(
       name=DatasetName(namespace_name=f'{namespace}:{name}'),
-      source=DatasetSource(root_path=path, filenames=[f'{name}.py']))
+      source=DatasetSource(
+          root_path=path,
+          filenames=[f'{name}.py'],
+          source_type=DatasetSourceType.CODE))
 
 
 def _create_templates(

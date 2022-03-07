@@ -81,9 +81,9 @@ def test_export_community_datasets(tmp_path):
 
   # Ensure datasets where correctly exported
   expected_output = textwrap.dedent("""\
-      {"name": "nlp:mnist", "source": "${nlp_path}/mnist/mnist.py"}
-      {"name": "nlp:robotnet", "source": {"root_path": "${nlp_path}/robotnet", "filenames": ["checksums.tsv", "label.txt", "robotnet.py"]}}
-      {"name": "tensorflow_graphics:cifar", "source": "${tfg_path}/cifar/cifar.py"}
+      {"name": "nlp:mnist", "source": "${nlp_path}/mnist/mnist.py", "source_type": "code"}
+      {"name": "nlp:robotnet", "source": {"root_path": "${nlp_path}/robotnet", "filenames": ["checksums.tsv", "label.txt", "robotnet.py"], "source_type": "code"}}
+      {"name": "tensorflow_graphics:cifar", "source": "${tfg_path}/cifar/cifar.py", "source_type": "code"}
       """)
   expected_output = string.Template(expected_output).substitute(
       tfg_path=tfg_path,
