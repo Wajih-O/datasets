@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for tensorflow_datasets.core.tfrecords_writer."""
+"""Tests for tensorflow_datasets.core.writer."""
 
 import json
 import os
@@ -28,7 +28,7 @@ from tensorflow_datasets.core import example_serializer
 from tensorflow_datasets.core import file_adapters
 from tensorflow_datasets.core import lazy_imports_lib
 from tensorflow_datasets.core import naming
-from tensorflow_datasets.core import tfrecords_writer
+from tensorflow_datasets.core import writer
 from tensorflow_datasets.core.tfrecords_writer import _ShardSpec
 from tensorflow_datasets.core.utils import shard_utils
 
