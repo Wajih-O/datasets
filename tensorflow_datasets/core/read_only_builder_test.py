@@ -251,7 +251,7 @@ _find_builder_dir = functools.partial(
 
 
 def test_find_builder_dir_with_multiple_data_dir(mock_fs: testing.MockFs):
-  mock_fs.add_file('path/to/ds0/1.0.0/features.json')
+  mock_fs.add_file('path/to/ds0/1.0.0/dataset_info.json')
 
   # Dataset not found.
   assert read_only_builder._find_builder_dir('ds0') is None
@@ -264,7 +264,8 @@ def test_find_builder_dir_with_multiple_data_dir(mock_fs: testing.MockFs):
     assert read_only_builder._find_builder_dir('ds0') == 'path/to/ds0/1.0.0'
 
     # Dataset present in 2 different data_dir
-    duplicate_path = os.path.join(constants.DATA_DIR, 'ds0/1.0.0/features.json')
+    duplicate_path = os.path.join(constants.DATA_DIR,
+                                  'ds0/1.0.0/dataset_info.json')
     mock_fs.add_file(duplicate_path)
     with pytest.raises(ValueError, match='detected in multiple locations'):
       read_only_builder._find_builder_dir('ds0')
@@ -275,15 +276,15 @@ def test_find_builder_dir_legacy_ds(mock_fs: testing.MockFs):
   mock_fs.add_file('path/to/ds0/1.0.0/temp.txt')
   assert _find_builder_dir('ds0') is None
 
-  mock_fs.add_file('path/to/ds0/1.0.0/features.json')
+  mock_fs.add_file('path/to/ds0/1.0.0/dataset_info.json')
   assert _find_builder_dir('ds0') == 'path/to/ds0/1.0.0'
 
 
 def test_find_builder_dir_multi_versions(mock_fs: testing.MockFs):
   """Versions should be sorted numerically (10 > 9)."""
-  mock_fs.add_file('path/to/ds0/1.0.0/features.json')
-  mock_fs.add_file('path/to/ds0/9.9.9/features.json')
-  mock_fs.add_file('path/to/ds0/10.0.0/features.json')
+  mock_fs.add_file('path/to/ds0/1.0.0/dataset_info.json')
+  mock_fs.add_file('path/to/ds0/9.9.9/dataset_info.json')
+  mock_fs.add_file('path/to/ds0/10.0.0/dataset_info.json')
   assert _find_builder_dir('ds0') == 'path/to/ds0/10.0.0'
   # Explicitly given version
   assert _find_builder_dir('ds0:9.9.9') == 'path/to/ds0/9.9.9'
@@ -293,33 +294,33 @@ def test_find_builder_dir_multi_versions(mock_fs: testing.MockFs):
 
 def test_find_builder_dir_bad_version_dir_name(mock_fs: testing.MockFs):
   """Ill-formatted folders should be ignored."""
-  mock_fs.add_file('path/to/ds0/9.9./features.json')
-  mock_fs.add_file('path/to/ds0/1.0.o/features.json')
-  mock_fs.add_file('path/to/ds0/other/features.json')
+  mock_fs.add_file('path/to/ds0/9.9./dataset_info.json')
+  mock_fs.add_file('path/to/ds0/1.0.o/dataset_info.json')
+  mock_fs.add_file('path/to/ds0/other/dataset_info.json')
   assert _find_builder_dir('ds0') is None
 
-  mock_fs.add_file('path/to/ds0/1.1.0/features.json')
+  mock_fs.add_file('path/to/ds0/1.1.0/dataset_info.json')
   assert _find_builder_dir('ds0') == 'path/to/ds0/1.1.0'
 
 
 def test_find_builder_config_no_code(mock_fs: testing.MockFs):
   """When the code can't be reached, config should be explicit."""
-  mock_fs.add_file('path/to/ds0/config/1.0.0/features.json')
-  mock_fs.add_file('path/to/ds0/1.1.0/features.json')
+  mock_fs.add_file('path/to/ds0/config/1.0.0/dataset_info.json')
+  mock_fs.add_file('path/to/ds0/1.1.0/dataset_info.json')
 
   # If the original code can't be reached, assume no config
   assert _find_builder_dir('ds0') == 'path/to/ds0/1.1.0'
   # Config is explicitly given
   assert _find_builder_dir('ds0/config') == 'path/to/ds0/config/1.0.0'
 
-  mock_fs.add_file('path/to/ds1/config/1.0.0/features.json')
+  mock_fs.add_file('path/to/ds1/config/1.0.0/dataset_info.json')
   # Config not available, return None
   assert _find_builder_dir('ds1') is None
   assert _find_builder_dir('ds1/config') == 'path/to/ds1/config/1.0.0'
 
 
 def test_find_builder_wrong_dir(mock_fs: testing.MockFs):
-  mock_fs.add_file('path/to/ds0/1.1.0/features.json')
+  mock_fs.add_file('path/to/ds0/1.1.0/dataset_info.json')
   assert _find_builder_dir('ds0') == 'path/to/ds0/1.1.0'
   assert _find_builder_dir('ds0', data_dir='path/to/other/dir') is None
 
@@ -337,13 +338,13 @@ def test_find_builder_config_code(mock_fs: testing.MockFs):
         for name in ('default_config', 'other_config')
     ]
 
-  mock_fs.add_file('path/to/my_dataset/default_config/0.0.1/features.json')
-  mock_fs.add_file('path/to/my_dataset/default_config/1.0.0/features.json')
-  mock_fs.add_file('path/to/my_dataset/other_config/1.0.0/features.json')
-  mock_fs.add_file('path/to/my_dataset/old_config/0.8.0/features.json')
-  mock_fs.add_file('path/to/my_dataset/old_config/1.0.0/features.json')
-  mock_fs.add_file('path/to/my_dataset/broken_config/features.json')
-  mock_fs.add_file('path/to/my_dataset/0.0.1/features.json')
+  mock_fs.add_file('path/to/my_dataset/default_config/0.0.1/dataset_info.json')
+  mock_fs.add_file('path/to/my_dataset/default_config/1.0.0/dataset_info.json')
+  mock_fs.add_file('path/to/my_dataset/other_config/1.0.0/dataset_info.json')
+  mock_fs.add_file('path/to/my_dataset/old_config/0.8.0/dataset_info.json')
+  mock_fs.add_file('path/to/my_dataset/old_config/1.0.0/dataset_info.json')
+  mock_fs.add_file('path/to/my_dataset/broken_config/dataset_info.json')
+  mock_fs.add_file('path/to/my_dataset/0.0.1/dataset_info.json')
 
   # If code can be reached, use it to load the default config name
   # Note that the existing version is loaded, even if the code is at a
@@ -366,10 +367,10 @@ def test_find_builder_config_code(mock_fs: testing.MockFs):
 
 def test_get_version_str(mock_fs: testing.MockFs):
 
-  mock_fs.add_file('path/to/ds/1.0.0/features.json')
-  mock_fs.add_file('path/to/ds/1.0.1/features.json')
-  mock_fs.add_file('path/to/ds/1.1.0/features.json')
-  mock_fs.add_file('path/to/ds/2.0.1/features.json')
+  mock_fs.add_file('path/to/ds/1.0.0/dataset_info.json')
+  mock_fs.add_file('path/to/ds/1.0.1/dataset_info.json')
+  mock_fs.add_file('path/to/ds/1.1.0/dataset_info.json')
+  mock_fs.add_file('path/to/ds/2.0.1/dataset_info.json')
 
   get_version_str = functools.partial(
       read_only_builder._get_version_str,

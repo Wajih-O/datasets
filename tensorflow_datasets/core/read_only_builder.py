@@ -354,9 +354,10 @@ def _find_builder_dir_single_dir(
 
   try:
     # Backward compatibility, in order to be a valid ReadOnlyBuilder, the folder
-    # has to contain the feature configuration.
+    # has to contain the dataset_info.json.
     builder_dir = os.fspath(builder_dir)
-    if tf.io.gfile.exists(feature_lib.make_config_path(builder_dir)):
+    dataset_info_file = dataset_info.dataset_info_path(builder_dir)
+    if tf.io.gfile.exists(dataset_info_file):
       return str(builder_dir)
   except tf.errors.PermissionDeniedError:
     return None
